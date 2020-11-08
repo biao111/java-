@@ -1,0 +1,83 @@
+Spring MVC
+1.什么是Spring MVC:
+    1.一种建构模式 view controller model，视图中调用模型中的某一个方法，要通过控制器（接收视图中所传输的数据，调用后端的业务逻辑的结果，再通过控制器返回到视图中）
+    2.是Spring体系的轻量级web MVC框架
+    3.Spring MVC的核心Controller控制器，用于处理请求产生响应
+    4.Spring MVC基于Spring IoC容器运行，所有对象被IoC管理
+2.文档路径：https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/web.html
+3.Spring MVC环境配置
+    1.前提：IDEA环境下创建Maven Webapp
+    2.Maven依赖springwebmvc，在pom.xml
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.1.9.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.28</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>5.1.9.RELEASE</version>
+        </dependency>
+    </dependencies>
+    3.web.xml配置DispatchServlet，在web.xml
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <!--
+            DispatcherServlet是Spring MVC最核心的对象
+            DispatcherServlet用于拦截Http请求,
+            并根据请求的URL调用与之对应的Controller方法,来完成Http请求的处理
+        -->
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--applicationContext.xml-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+        <!--
+            在Web应用启动时自动创建Spring IOC容器,
+            并初始化DispatcherServlet
+        -->
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    3.配置applicationContext的mvc标记
+    <!--
+    context:component-scan 标签作用
+    在Spring IOC初始化过程中,自动创建并管理com.imooc.springmvc及子包中
+    拥有以下注解的对象.
+    @Repository
+    @Service
+    @Controller
+    @Component
+    -->
+    <context:component-scan base-package="com.imooc.springmvc"></context:component-scan>
+    <!--启用Spring MVC的注解开发模式-->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- response.setContentType("text/html;charset=utf-8") -->
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=utf-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- 将图片/JS/CSS等静态资源排除在外,可提高执行效率 -->
+    <mvc:default-servlet-handler/>
+    4.开发Controller控制器
+    @Controller
+    public class TestController {
+        @GetMapping("/t") //localhost/t
+        @ResponseBody //直接向响应输出字符串数据,不跳转页面
+        public String test(){
+            return "Hello Spring MVC";
+        }
+    }

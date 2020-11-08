@@ -1,0 +1,86 @@
+Spring与Mybatis整合配置
+1.依赖mybatis-spring及驱动
+2.配置数据与连接
+3.配置SqlSessionFactory
+4.配置Mapper扫描器
+5.创建mybatis-config.xml
+
+整合部分
+1.打开pom.xml
+    <!--Mybatis整合步骤: 1.引入依赖 -->
+        <!-- JDBC组件-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.2.6.RELEASE</version>
+        </dependency>
+        <!-- Mybatis组件-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+        <!-- MyBatis与Spring整合组件 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+        <!-- JDBC驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <!-- 与本地的MySQL版本保持一致-->
+            <version>8.0.12</version>
+        </dependency>
+        <!-- 连接池 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.14</version>
+        </dependency>
+2.ctrl+shift+n 搜索 applicationContext.xml，并打开
+3.  <!-- MyBatis与Spring的整合配置 -->
+    <!--2.配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <!-- 数据库jdbc连接信息 ,MySQL 8.0版本以后一定要加入cj -->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <!-- 数据库的连接字符串 -->
+        <property name="url" value="jdbc:mysql://localhost:3306/imooc_reader?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai&amp;allowPublicKeyRetrieval=true"/>
+        <!-- 用户名-->
+        <property name="username" value="root"/>
+        <!-- 密码-->
+        <property name="password" value="yb19970329"/>
+        <!-- 数据库连接池初始化 人数>使用人数-->
+        <property name="initialSize" value="6"/>
+        <!-- 数据库连接池最大的总数，同时访问人数的最大的峰值-->
+        <property name="maxActive" value="20"/>
+    </bean>
+    <!-- 3. SqlSessionFactoryBean用于根据配置信息创建SqlSessionFactory,不再需要我们自己编码创建 -->
+    <!-- 原生Mybaits与Spring整合
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    -->
+    <bean id="sessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <!-- 设置数据源，连接数据库 ref:关联-->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- mapper.xml存放的路径，此时在src/resources/下创建mappers目录，classpath指的是开发中的resources-->
+        <property name="mapperLocations" value="classpath:mappers/*.xml"/>
+        <!-- 5.MyBatis配置文件地址 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+    <!--4.配置Mapper扫描器，指定包名，在ioc容器初始化mybatis,对这个包下所有的mapper接口进行扫描，
+    并根据对应的xml文件生成这个接口对应的实现类-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.imooc.reader.mapper"/>
+    </bean>
+4.在src/resources/mappers下创建mybatis-configxml文件
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 属性名与字段名驼峰命名转换-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+</configuration>

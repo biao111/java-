@@ -1,0 +1,21 @@
+1.J2EE与Tomcat的关系
+    1.J2EE是一组技术规范与指南，具体的实现由软件厂商决定的
+    2.Tomcat是J2EE web(Servlet 与jsp)标准的实现者
+    3.J2SE是J2EE运行的基石，运行Tomcat离不开J2SE
+
+Servlet
+1.Servlet（Server Applet）服务器小程序，主要功能生成动态网页
+2.Servlet是J2EE最重要的组成部分，学习重点
+
+安装Tomcat 8.0x版本
+下载网址：tomcat.apache.org 选择8.0版本
+启动tomcat：bin目录下startup.bat
+关闭tomcat: ctrl + c 或者点击叉子关闭
+
+安装eclipse
+下载网址：https://www.eclipse.org/downloads/packages/ 选择javaee版本
+
+在eclipce中部署tomcat：
+    1.windows->preferneces->click installed JREs->选中jre版本
+    2.windows->servers->new server ->tomcat v8.5Server->next->路径->next->finsh
+    3.click server ->server locations选择第二项->deploy path 选择tomcat里的webapps 

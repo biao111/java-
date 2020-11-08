@@ -1,0 +1,74 @@
+java异常
+1.什么是异常：程序错误：
+    1.编译错误
+    2.运行错误
+        1.使用空的对象引用条用方法
+        2.数组访问时下标越界
+        3.算术运算除数为零
+        4.类型转换时，无法正常转型
+
+2.异常分类
+    1.根类：Throwable
+    2.字类：1.Error ：程序无法处理的错误，标识运行应用程序中较严重的问题
+                1.常见的错误：
+                    1.虚拟机错误
+                    2.内存溢出
+                    3.线程死锁
+            Exception：程序本身可以处理的异常，异常处理通常指针对这种类型的处理
+                1.方向：
+                    1.非检查异类（Uncheck Exception）：
+                        1.方法：
+                            1.捕获异常
+                            2.放任不管
+                        2.RuntiomeException:
+                            1.空指针异常（NullPointException）
+                            2.数组下标越界异常（ArrayIndexException）
+                            3.算数异常（ArithemticException）
+                            4.类型转换异常（ClassCastException）
+                    2.检查异常（CheckedException）:
+                        1.I/o异常（IOException）
+                        2.  sql异常（SQLException）
+    3.异常处理：
+        1.抛出异常
+            1.异常对象：
+                1.异常类型
+                2.异常出现时程序状态
+        2.捕获异常：寻找合适的处理器，执行相应的逻辑
+            1.规定：1.对于可检查的异常必须捕获或者声明抛出
+                    2.允许忽略不可查的RuntiomeException（含子类）和Error(含子类)
+        3.实现：try/catch/finally/throw/throws
+            1.捕获异常：
+                1.try:执行可能产生的异常代码
+                2.catch：捕获异常
+                3.finally：无论发生什么异常代码总能执行
+            2.声明异常：
+                1.throws：声明可能要抛出的异常，谁调用了这个方法，就有谁来解决这个方法
+            3.抛出异常：
+                1.throw:手动抛出异常
+            4.try-catch-finally:
+                public void method(){
+                    try{
+                        //代码段1
+                        //产生异常的代码段2
+                    }catch(Exception e){
+                        e.printStackTrace() //堆栈信息结果，错误的描述，错误的类型，错误的位置
+                        //对异常进行处理的代码段3
+                    }finally{
+                        //代码段4
+                    }
+                }
+                1.语法要求：
+                    1.try块后可以接零个或者多个catch块，如果没有catch，则必须跟一个finally块
+                2.多重catch块：
+                    1.多重catch块可以捕获不同的类型的问题，进行提捕获示，类型为Exception的子类
+                    2.为了防止漏掉错误，在多重的catch块最后加catch(Exception e)的父类块，注意父类块只能放在结尾
+                3.特例：System.out.exit(1); //终止程序运行  
+                4.return:在finlly里不建议去写return，这样会覆盖前面的return
+            5.throw:用在方法定义时声明该方法要抛出的异常类型
+                    当方法抛出异常列表中的异常时，方法将部队这些类型及其子类类型 的异常处理，而抛出调用该方法的方法，由他们去处理
+                pubilc void method() throws Exception1,Exception2,Exception3,...,ExceptionN{
+                    //可产生的异常代码
+                }
+                1.方法：
+                    1.throws后面接多个异常类型，中间逗号分隔
+                    2.throws后面直接Excption

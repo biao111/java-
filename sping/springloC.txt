@@ -1,0 +1,99 @@
+springIoc
+1.Ioc控制反转：有代理人来创建与管理对象，消费者通过代理人来获取对象（引入中间人负责）
+2.目的：降低对象之间的耦合
+好处：对象之间可以来回变
+3.DI依赖注入：（Dependency Injection）具体技术实现，通过编程技术对运行时，对象的创建与绑定
+  1.DI在Java中利用反射技术实现对象的注入
+4.职责（总结）：
+    1.对象的控制权交由第三方统一管理（IoC控制反转）
+    2.利用java反射技术实现运行时对象创建与关联（DI依赖注入）
+    3.基于配置提高应用程序的可维护性和扩展性
+spring
+1.含义：
+    广义：Spring生态系统
+        1.分布式服务
+        2.响应式编程
+        3.云端技术
+        4.web apps
+        5.serverless无服务器编程
+        6.事件驱动
+        7.批处理
+    狭义：Spring框架 （Spring Fremework）
+        1.特点：
+            1.Spring框架是企业开发复杂性的一站式解决方案
+            2.Spring核心IoC容器和AOP面向切面编程
+            3.Spring IoC负责创建与管理系统对象，并在此基础上扩展功能
+
+springIoC的使用
+1.创建工程
+2.在pom.xml文件下，创建依赖
+ <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.6.RELEASE</version>
+        </dependency>
+    </dependencies>
+3.在创建依赖之前可以创建阿里云仓库，保证maven下载的速度
+ <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+    </repositories>
+4.在libary下可以看到下载的包
+    1.spring-core:spring基础代码都在这里
+    2.spring-beans:java对对象管理的模块，Ioc设置关联和管理的模块
+    3.spring-expression:spring内置的表达式模块
+    4.spring-jcl:与日志交互的模块，处理产生底层的日志文件
+    5.spring-aop:面向切面编程的模块
+    6.spring-context:提供的ApplicationContext对象，通过代码对springIoC容器创建
+5.在resourcces，创建ApplicationContext.xml文件
+6.文件格式位置spring官网->poject->spring Framwork->learn->reference Doc. -> code ->1.2.1. Configuration Metadata
+    <?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+</beans>
+7.<!-- 在IoC容器启动时，自动由Spring实例化Apple对象，取名为sweetApple放入到容器中 -->
+    <!-- 用于实例化java对象的标签 -->
+    <bean id="sweetApple" class="com.yykj.spring.ioc.entity.Apple">
+        <property name="title" value="红富士"></property>
+        <property name="origin" value="欧洲"></property>
+        <property name="color" value="红色"></property>
+     </bean>
+
+    <bean id="sourtApple" class="com.yykj.spring.ioc.entity.Apple">
+        <property name="title" value="青苹果"></property>
+        <property name="origin" value="中亚"></property>
+        <property name="color" value="绿色"></property>
+    </bean>
+
+    <bean id="softApple" class="com.yykj.spring.ioc.entity.Apple">
+        <property name="title" value="金帅"></property>
+        <property name="origin" value="中国"></property>
+        <property name="color" value="黄色"></property>
+    </bean>
+8.验证;在com.yykj.spring.ioc下，创建SpringApplication.class
+package com.yykj.spring.ioc;
+
+import com.yykj.spring.ioc.entity.Apple;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class SpringApplication {
+    public static void main(String[] args) {
+        ApplicationContext context =  new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+        Apple sweetApple = context.getBean("sweetApple", Apple.class);
+        System.out.println(sweetApple.getTitle());
+        System.out.println(sweetApple.getOrigin());
+    }
+}
+9.设置关联，动态I实例化，动态绑定，利用java反射技术
+<bean id="lily" class="com.yykj.spring.ioc.entity.Child">
+        <property name="name" value="lily"></property>
+        <!-- 设置关联 -->
+        <property name="apple" ref="sweetApple"></property>
+    </bean>

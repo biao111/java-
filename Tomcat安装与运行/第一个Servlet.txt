@@ -1,0 +1,57 @@
+第一个Servlet
+Sevlet访问方法:http：//IP地址：端口/context-path(工程名称)/url-mapping
+
+#FirstServlet的class文件
+package com.imooc.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class FirstServlet extends HttpServlet{
+
+	@Override       //重写service方法，选中Sourse->Override/Implement Methods->选择倒数第二个
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//接收请求发来的参数
+        String name =request.getParameter("name");
+        //要返回的结果
+		String html ="<h1>hi," + name + "</h1><hr>";
+		//从服务器向浏览器返回的输出流，通过out对象发送回浏览器
+        PrintWriter out = response.getWriter(); 
+		//将html发送回浏览器
+        out.println(html);
+	}
+}
+
+#web.xml配置文件
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>FirstServlet</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <!-- 声明servlet -->
+  <servlet>
+  	<!-- servlet别名 -->
+  	<servlet-name>first</servlet-name>
+    <!-- 在这里增加一个first的实现类 -->
+ 	<servlet-class>com.imooc.servlet.FirstServlet</servlet-class>
+  </servlet>
+  
+  <!-- 将servlet与URL绑定  -->
+  <!-- 映射 -->
+  <servlet-mapping>
+    <!-- 上下name保持一致 -->
+  	<servlet-name>first</servlet-name>
+  	<url-pattern>/hi</url-pattern>
+  </servlet-mapping>
+</web-app>

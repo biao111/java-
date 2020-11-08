@@ -1,0 +1,107 @@
+MyBatis
+1.特点：
+    1.优秀的持久框架
+    2.使用xml将sql与程序解耦，便于维护
+    3.执行高效，是jdbc的延申
+2.开发流程
+    1.引入mybatis依赖
+    <dependencies>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
+    <dependencies>
+    2.创建核心配置文件
+      
+    <!--设置默认指向的数据库-->
+    <environments default="dev">
+        <!--配置环境，不同的环境不同的id名字-->
+        <environment id="dev">
+            <!-- 采用JDBC方式对数据库事务进行commit/rollback -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!--采用连接池方式管理数据库连接-->
+            <!--<dataSource type="POOLED">-->
+            <dataSource type="com.imooc.mybatis.datasource.C3P0DataSourceFactory">
+                <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+                <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/babytun?useUnicode=true&amp;characterEncoding=UTF-8"/>
+                <property name="user" value="root"/>
+                <property name="password" value="root"/>
+                <property name="initialPoolSize" value="5"/>
+                <property name="maxPoolSize" value="20"/>
+                <property name="minPoolSize" value="5"/>
+                <!--...-->
+            </dataSource>
+        </environment>
+        <environment id="dev">
+            <!-- 采用JDBC方式对数据库事务进行commit/rollback -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!--采用连接池方式管理数据库连接-->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://192.168.1.155:3306/babytun?useUnicode=true&amp;characterEncoding=UTF-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="********"/>
+            </dataSource>
+        </environment>
+    </environments>
+    3.创建实体类
+    4.创建Mapper映射文件
+    5.初始化SessionFactory
+        1.SqlSessionFactory是mybatis的核心对象
+        2.用于初始化mybatis，创建SqlSession对象
+        3.保证SqlSessionFactory在用用全局唯一
+        4.SqlSessionFactory对象提供了数据表的crud对应的方法
+        5.
+         @Test
+        public void testSqlSessionFactory() throws IOException {
+            //利用Reader加载classpath下的mybatis-config.xml核心配置文件
+            Reader reader = Resources.getResourceAsReader("mybatis-config.xml");
+            //初始化SqlSessionFactory对象,同时解析mybatis-config.xml文件
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            System.out.println("SessionFactory加载成功");
+            SqlSession sqlSession = null;
+            try {
+                //创建SqlSession对象,SqlSession是JDBC的扩展类,用于与数据库交互
+                sqlSession = sqlSessionFactory.openSession();
+                //创建数据库连接(测试用)
+                Connection connection = sqlSession.getConnection();
+                System.out.println(connection);
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                if(sqlSession != null){
+                    //如果type="POOLED",代表使用连接池,close则是将连接回收到连接池中
+                    //如果type="UNPOOLED",代表直连,close则会调用Connection.close()方法关闭连接
+                    sqlSession.close();
+                }
+            }
+        }
+    6.利用SqlSession对象操作数据
+    <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="goods">
+    <cache eviction="LRU" flushInterval="600000" size="512" readOnly="true"/>
+    <select id="selectAll" resultType="com.imooc.mybatis.entity.Goods" useCache="false">
+        select * from t_goods order by goods_id desc limit 10
+    </select>
+    <!-- 单参数传递,使用parameterType指定参数的数据类型即可,SQL中#{value}提取参数-->
+    <select id="selectById" parameterType="Integer" resultType="com.imooc.mybatis.entity.Goods">
+        select * from t_goods where  goods_id = #{value}
+    </select>
+
+    <!-- 多参数传递时,使用parameterType指定Map接口,SQL中#{key}提取参数 -->
+    <select id="selectByPriceRange" parameterType="java.util.Map" resultType="com.imooc.mybatis.entity.Goods">
+        select * from t_goods
+        where
+          current_price between  #{min} and #{max}
+        order by current_price
+        limit 0,#{limt}
+    </select>

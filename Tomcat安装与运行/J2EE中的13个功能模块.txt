@@ -1,0 +1,16 @@
+J2EE中的13个功能模块
+广泛的四个模块：
+    1.Servlet web服务器小程序
+    2.jsp 服务器页面
+    3.JDBC 数据库交互模块
+    4.XML xml交互模式
+高级场景下的模块：
+    1.EJB 企业级 Java bean
+    2.RML 远程调用
+    3.JNDL 目录服务
+    4.JMS消息服务
+    5.JTA 事务管理
+    6.JavaMail 发送 /接收Email
+    7.JAF 安全框架
+    8.CORBA CORBA集成
+    JTS CORBA事务监控

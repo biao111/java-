@@ -1,0 +1,197 @@
+Spring与SpringMVC环境配置
+
+1.依赖spring-webmvc
+2.配置DispatcherServlet
+3.启动Spring MVC注解模式
+4.配置请求与响应字符集
+5.配置FreeMarker模板引擎
+6.配置Json序列化组件
+
+配置环境 
+1.New project -> Maven ->GroupId:com.imooc ArtifactId:immooc-reader ->Finish
+2.基于Maven下的web开发改造：
+    1.click project Structure -> Modules -> Web -> Deployment Deesccriptors Path ../src\main\webapp\WEB-INF\web.xml
+    web Resource Dictory Path:D:\Code\java_code\imooc-reader\src\main\webapp
+    2.Create Artifact -> OK
+    3.在src/main/webapp/WEB-INF
+    4.click Add Configuration(右上角) -> click Tomcat Serrver -> name:start Tomcat -> click Deployment -> + Artifact -> Application context 改为 /
+    5.click Server -> 取消After launch -> 修改 "on 'update' action" and "on frame deactivation"
+    为"Update classes and resourse" -> ok
+3. <!-- 1.配置Maven依赖spring-webmvc-->
+    1.click pom.xml
+    2.引入阿里云的Maven的镜像
+        <repositories>
+            <repository>
+                <id>aliyun</id>
+                <name>aliyun</name>
+                <url>https://maven.aliyun.com/repository/public</url>
+            </repository>
+        </repositories>
+    3.引入依赖
+    <!-- 引入依赖-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.2.6.RELEASE</version>
+        </dependency>
+
+        <!-- 引入Freemarker-->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
+        </dependency>
+
+        <!-- 整合组件 spring-context-support提供了freemarker支持包  -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>5.2.6.RELEASE</version>
+        </dependency>
+
+        <!-- Jackson 应用大量的ajax和json序列工具包-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <!--jackson注解包-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <!--数据绑定包-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+    </dependencies>
+4.click project Structure ->Artifact ->将Available Elements下的所有jar包导入WEB-INF/lib下
+5.click web.xml 配置DispatcherServlet
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext*.xml</param-value>
+        </init-param>
+    </servlet>
+6. <!--2.配置DispatcherServlet-->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- 初始化参数 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <!--配置文件的路径-->
+            <param-value>classpath:applicationContext*.xml</param-value>
+        </init-param>
+        <!--web应用时候初始化这个 servlet -->
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <!--映射url-->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+7.在resources目录下创建 applicationContext.xml
+8.在java包内创建com.imooc.reader，以后将所有的类放在此处
+9. 在applicationContext.xml中 
+    <!--3.开启SpringMVC注解模式-->
+    <context:component-scan base-package="com.imooc"/>
+    <!-- 真正开启mvc注解模式-->
+   <mvc:annotation-driven>
+        <!-- 解决响应中的中文乱码，message-converters消息转换器 -->
+        <mvc:message-converters>
+            <!-- 这个类管理响应所产生的字符集-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 浏览器将所产生的结果，按照utf-8转换后，按照http格式文本进行解析 -->
+                        <value>text/html;charset=utf-8</value>
+                        <!--6.JSON(Jackson)序列化输出配置 -->
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!--将静态资源排除在外，从而提高springmvc对url处理效率-->
+    <mvc:default-servlet-handler/>
+10.在java包下创建com.imoo.reader的包,未来所有的包都创建在这里 <context:component-scan base-package="com.imooc"/>
+    这个包变绿了，证明正常创建，此句话是spring框架启用注解模式
+11.打开web.xml文件，解决中文乱码问题
+    <!-- 4.解决中文乱码，filter字符集过滤器，名字可以自定义-->
+        <!-- filter只对post请求进行拦截，get请求在tomcat8版本之后默认为 UTF-8-->
+        <filter>
+            <filter-name>characterFilter</filter-name>
+            <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+            <!-- 初始化,encoding 为UTF-8-->
+            <init-param>
+                <param-name>encoding</param-name>
+                <param-value>UTF-8</param-value>
+            </init-param>
+        </filter>
+        <!-- 映射 对所有的url进行拦截-->
+        <filter-mapping>
+            <filter-name>characterFilter</filter-name>
+            <url-pattern>/*</url-pattern>
+        </filter-mapping>
+12.解决响应中的中文乱码：第九步applicationContext.xml代码中的<mvc:annotation-driven>
+13. 打开applicationContext.xml
+<!-- 5.配置Freemarker模板引擎 -->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <!-- 脚本地址，在此路径下创建ftl-->
+        <property name="templateLoaderPath" value="/WEB-INF/ftl"/>
+        <!-- 本身需要配置的参数 -->
+        <property name="freemarkerSettings">
+            <props>
+                <!-- 核心属性，默认设置编码为utf-8 读取ftl文件-->
+                <prop key="defaultEncoding">UTF-8</prop>
+            </props>
+        </property>
+    </bean>
+    <!-- 视图解析器-->
+    <bean id="ViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <!-- 在视图解析器中，对数据和模板结合，所产生的新的HTML片段，内容类型为中文 HTML-->
+        <property name="contentType" value="text/html;charset=utf-8"/>
+        <!-- 要加载的模板引擎的扩展名是什么-->
+        <property name="suffix" value=".ftl"/>
+    </bean>
+14 <!--6.JSON(Jackson)序列化输出配置 --> 代码位置在第九步的位置
+15.测试freemarker正常使用：在ftl文件下创建html，test.html,拓展名改为.ftl
+      ,body内书写测试页面
+16.在src/main/java/com/imooc/reader/下创建controller包，再创建TestController.class
+package com.imooc.reader.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Controller
+public class TestController {
+    //测试方法，测试freemarker能否使用
+    @GetMapping("/test/t1") //绑定地址
+    public ModelAndView test1(){
+        return new ModelAndView("/test");
+    }
+    //测试json序列化输出
+    @GetMapping("/test/t2")
+    @ResponseBody
+    public Map test2(){
+        Map result = new HashMap();
+        result.put("test", "测试文本");
+        return result;
+    }
+}       
+
